@@ -8,16 +8,19 @@ module.exports = memUsage;
 function memUsage() {
 
   return function memUsage(req, res, next) {
-    let hd = new memwatch.HeapDiff();
-    console.log('starting req');
-    let memStart = process.memoryUsage().rss;
+    // used to get head when req starts
+    let hd = new memwatch.HeapDiff()
+      // used to get mem usage when request starts
+      , memStart = process.memoryUsage().rss;
 
+    // hook when headers are about to be set
     onHeaders(res, function onHeaders() {
-      let now = process.memoryUsage().rss;
-      let totalMem = now - memStart;
-      console.log(hd.end().change.details);
-      console.log(`total ${totalMem}, now ${now}, start ${memStart}`);
+      let now = process.memoryUsage().rss
+        , totalMem = now - memStart
+        , stringObjects = _.find(hd.end().change.details, (key) => key.what === 'String');
+
       res.setHeader('X-Total-Mem-Usage', totalMem * 1e-6);
+      res.setHeader('X-String-Objects', stringObjects['+']);
 
     });
 
