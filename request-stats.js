@@ -3,18 +3,18 @@ const onHeaders = require('on-headers');
 const memwatch = require('memwatch-next');
 const _ = require('lodash');
 
-module.exports = memUsage;
+module.exports = deets;
 
-function memUsage() {
+function deets() {
 
-  return function memUsage(req, res, next) {
-    // used to get head when req starts
+  return (req, res, next) => {
+    // used to get heap when req starts
     let hd = new memwatch.HeapDiff()
       // used to get mem usage when request starts
       , memStart = process.memoryUsage().rss;
 
     // hook when headers are about to be set
-    onHeaders(res, function onHeaders() {
+    onHeaders(res, () => {
       let now = process.memoryUsage().rss
         , totalMem = now - memStart
         , stringObjects = _.find(hd.end().change.details, (key) => key.what === 'String');
